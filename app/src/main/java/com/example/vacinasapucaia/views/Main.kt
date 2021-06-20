@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.vacinasapucaia.R
 import com.example.vacinasapucaia.databinding.FragmentMainBinding
+import com.example.vacinasapucaia.repository.Repository
 import com.squareup.picasso.Picasso
 
 class Main : Fragment() {
@@ -22,8 +23,11 @@ class Main : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
+        val repository = Repository()
+        val factory = MainViewModelFactory(repository)
+
         _binding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_main, container, false)
-        _viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        _viewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
 
         _viewModel.getCalendar()
 

@@ -8,9 +8,8 @@ import com.example.vacinasapucaia.repository.Repository
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val repository: Repository) : ViewModel() {
 
-    private val repository = Repository()
 
     private val _mainCalendar = MutableLiveData<String>()
     val mainCalendar: LiveData<String> = _mainCalendar
