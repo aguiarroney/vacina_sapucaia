@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -32,6 +33,7 @@ class Main : Fragment() {
         _viewModel.getCalendar()
 
         _viewModel.mainCalendar.observe(viewLifecycleOwner, Observer {
+            _binding.cvMainCalendar.isVisible = true
             Picasso.with(context)
                 .load(it)
                 .into(_binding.ivMainCalendar)
