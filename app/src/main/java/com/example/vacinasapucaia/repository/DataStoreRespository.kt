@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
-const val PREFERENCE_NAME = "preference"
-
 class DataStoreRespository(context: Context) {
+
+    companion object {
+        const val PREFERENCE_NAME = "preference"
+    }
 
     private object PreferencesKeys {
         val name = preferencesKey<String>(name = "my_name")

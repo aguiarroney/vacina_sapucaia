@@ -12,6 +12,8 @@ import com.example.vacinasapucaia.repository.DataStoreRespository
 import com.example.vacinasapucaia.repository.Repository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -30,9 +32,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val response = _repository.geCalendar()
             if (response.isEmpty())
                 _snackBarControll.value = true
-            else
+            else {
                 _mainCalendar.value = response
+
+            }
         }
+    }
+
+    fun getCurrentTime(): String {
+        val sdf = SimpleDateFormat("hh:mm dd/M/yyyy")
+        return sdf.format(Date())
     }
 
     fun readFromDataStore(url: String) {

@@ -46,6 +46,7 @@ class Main : Fragment() {
             Picasso.with(context)
                 .load(it)
                 .into(_binding.ivMainCalendar)
+            _binding.tvDate.text = getString(R.string.refresh_label, _viewModel.getCurrentTime())
             _viewModel.readFromDataStore(it)
             _viewModel.saveToDataStore(it)
         })

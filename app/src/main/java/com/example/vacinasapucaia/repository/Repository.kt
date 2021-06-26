@@ -16,6 +16,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 class Repository(private val context: Context) {
 
     companion object {
+
         const val BASE_URL = "http://transparencia.covid.sapucaia.rj.gov.br"
 
         private val okHTTPClient: OkHttpClient.Builder = OkHttpClient.Builder()
@@ -64,7 +65,7 @@ class Repository(private val context: Context) {
             } else {
                 Log.i("response erro", "${response.errorBody()}")
             }
-            
+
         } else {
             Log.i("redes", "internet desligada")
         }

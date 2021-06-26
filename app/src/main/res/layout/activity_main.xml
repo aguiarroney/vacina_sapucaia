@@ -6,36 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/iv_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/header_icon"
-        android:src="@mipmap/header_icon_foreground"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-<!--    <TextView-->
-<!--        android:id="@+id/tv_header_label"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="@string/main_label"-->
-<!--        android:textColor="@color/black"-->
-<!--        android:textSize="16sp"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/tv_header_subtitle"-->
-<!--        app:layout_constraintStart_toEndOf="@id/iv_header"-->
-<!--        app:layout_constraintTop_toTopOf="@id/iv_header" />-->
-
-    <TextView
-        android:id="@+id/tv_header_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/header_label"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@id/iv_header"
-        app:layout_constraintStart_toEndOf="@id/iv_header"
-        app:layout_constraintTop_toTopOf="@+id/iv_header" />
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment_container"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -43,7 +13,7 @@
         android:layout_height="0dp"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_header"
+        app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_graph" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
