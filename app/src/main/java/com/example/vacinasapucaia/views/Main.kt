@@ -2,9 +2,8 @@ package com.example.vacinasapucaia.views
 
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
@@ -61,7 +60,23 @@ class Main : Fragment() {
                 _snackBar.show()
             }
         })
-
+        setHasOptionsMenu(true)
         return _binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main_menu, menu)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.mi_refresh -> {
+                Log.i("refresh", "refresh")
+                _binding.pgProgressBar.isVisible = true
+                _viewModel.getCalendar()
+            }
+        }
+        return true
     }
 }
