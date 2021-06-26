@@ -29,11 +29,8 @@ class Main : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        val repository = Repository(requireContext())
-        val factory = MainViewModelFactory(repository)
-
         _binding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_main, container, false)
-        _viewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
+        _viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         _snackBar = Snackbar.make(
             requireActivity().findViewById(android.R.id.content),
@@ -49,6 +46,8 @@ class Main : Fragment() {
             Picasso.with(context)
                 .load(it)
                 .into(_binding.ivMainCalendar)
+            _viewModel.readFromDataStore(it)
+            _viewModel.saveToDataStore(it)
         })
 
         _viewModel.snackBarControll.observe(viewLifecycleOwner, {
@@ -60,6 +59,8 @@ class Main : Fragment() {
                 _snackBar.show()
             }
         })
+
+
         setHasOptionsMenu(true)
         return _binding.root
     }
