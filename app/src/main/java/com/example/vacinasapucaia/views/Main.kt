@@ -46,13 +46,15 @@ class Main : Fragment() {
 
         _viewModel.mainCalendar.observe(viewLifecycleOwner, Observer {
             _binding.cvMainCalendar.isVisible = true
+            _binding.pgProgressBar.isVisible = false
             Picasso.with(context)
                 .load(it)
                 .into(_binding.ivMainCalendar)
         })
 
         _viewModel.snackBarControll.observe(viewLifecycleOwner, {
-            if(it){
+            if (it) {
+                _binding.pgProgressBar.isVisible = false
                 _snackBar.setAction("Ok") {
                     _viewModel.restoreSnackBarState()
                 }
