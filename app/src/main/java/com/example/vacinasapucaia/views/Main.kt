@@ -25,7 +25,7 @@ class Main : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        val repository = Repository()
+        val repository = Repository(requireContext())
         val factory = MainViewModelFactory(repository)
 
         _binding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_main, container, false)
