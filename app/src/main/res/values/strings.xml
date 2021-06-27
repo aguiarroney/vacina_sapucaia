@@ -7,4 +7,8 @@
     <string name="header_label">Dados sobre vacinação\ncontra covid-19</string>
     <string name="main_label">Prefeitura Municipal de Sapucaia</string>
     <string name="refresh_label">App atualizado às %s</string>
+
+    <!-- Notification strings    -->
+    <string name="notification_channel_id">1</string>
+    <string name="notification_body">Alteração no calendário de vacinação</string>
 </resources>

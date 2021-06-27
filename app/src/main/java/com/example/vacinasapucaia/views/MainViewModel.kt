@@ -1,20 +1,21 @@
 package com.example.vacinasapucaia.views
 
-import android.annotation.SuppressLint
 import android.app.Application
+import android.app.NotificationManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
+import com.example.vacinasapucaia.R
 import com.example.vacinasapucaia.local.getDatabase
 import com.example.vacinasapucaia.models.Calendar
 import com.example.vacinasapucaia.repository.Repository
 import com.example.vacinasapucaia.repository.RoomRepository
+import com.example.vacinasapucaia.repository.sendNotification
 import com.example.vacinasapucaia.utils.asDataBaseModel
 import com.example.vacinasapucaia.utils.getCurrentTime
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -34,10 +35,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     @RequiresApi(Build.VERSION_CODES.M)
     fun getCalendar() {
         viewModelScope.launch {
-            val response = _repository.geCalendar()
+            val response = _repository.getCalendar()
             if (response.isEmpty())
                 _snackBarControll.value = true
             else {
+                checkIfIsNewCalendar(response)
                 val currentTime = getCurrentTime()
                 _mainCalendar.value = response
                 _refreshTime.value = currentTime
@@ -48,6 +50,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         currentTime
                     )
                 )
+            }
+        }
+    }
+
+    private fun checkIfIsNewCalendar(url: String) {
+        viewModelScope.launch {
+            val lastCalendar = _roomRespository.getLastCalendarInsertion().calendarUrl
+            if (lastCalendar != url) {
+                callNotification()
             }
         }
     }
@@ -77,4 +88,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun callNotification() {
+        val notificationManager = ContextCompat.getSystemService(
+            getApplication(),
+            NotificationManager::class.java
+        ) as NotificationManager
+
+        notificationManager.sendNotification(
+            getApplication<Application>().getString(R.string.notification_body),
+            getApplication()
+        )
+    }
 }

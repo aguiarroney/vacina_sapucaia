@@ -49,7 +49,7 @@ class Repository(private val context: Context) {
 
 
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun geCalendar(): String {
+    suspend fun getCalendar(): String {
         var calendarUrl = ""
 
         if (isNetworkAvailable(context)) {

@@ -26,7 +26,7 @@ class UpdateCalendarWorker(appContext: Context, params: WorkerParameters) :
         val roomRepository = RoomRepository(getDatabase(applicationContext))
 
         return try {
-            val calendarUrl = repository.geCalendar()
+            val calendarUrl = repository.getCalendar()
             val calendar = Calendar(0, calendarUrl, getCurrentTime())
             roomRepository.insertCalendar(calendar.asDataBaseModel())
             Result.success()

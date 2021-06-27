@@ -1,5 +1,8 @@
 package com.example.vacinasapucaia.views
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -66,7 +69,7 @@ class Main : Fragment() {
             }
         })
 
-
+        createChannel(getString(R.string.notification_channel_id), getString(R.string.app_name))
         setHasOptionsMenu(true)
         return _binding.root
     }
@@ -84,5 +87,24 @@ class Main : Fragment() {
             }
         }
         return true
+    }
+
+    private fun createChannel(channelId: String, channelName: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_LOW
+            )
+
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.description = "Alteração no calendario"
+
+            val notificationManager =
+                requireActivity().getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
     }
 }
