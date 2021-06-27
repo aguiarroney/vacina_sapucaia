@@ -39,6 +39,8 @@ class App : Application() {
             ExistingPeriodicWorkPolicy.KEEP,
             repeatingRequest
         )
+
+        
     }
 
     override fun onCreate() {

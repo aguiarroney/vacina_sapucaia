@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.vacinasapucaia.R
 import com.example.vacinasapucaia.databinding.FragmentMainBinding
+import com.example.vacinasapucaia.work.UpdateCalendarWorker
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 
