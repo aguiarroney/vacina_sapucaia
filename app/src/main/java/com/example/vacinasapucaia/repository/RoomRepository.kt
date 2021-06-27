@@ -9,6 +9,9 @@ class RoomRepository(private val database: CalendarDatabase) {
 
     suspend fun insertCalendar(calendarEntities: DatabaseEntities) {
         withContext(Dispatchers.IO) {
+            if (database.calendarDAO.getDatabaseSize() >= MAX_SIZE)
+                database.calendarDAO.clearRoom()
+
             database.calendarDAO.insertCalendar(calendarEntities)
         }
     }
@@ -17,6 +20,16 @@ class RoomRepository(private val database: CalendarDatabase) {
         return withContext(Dispatchers.IO) {
             database.calendarDAO.getLastInsertion()
         }
+    }
+
+    suspend fun getDatabeseSize(): Int {
+        return withContext(Dispatchers.IO) {
+            database.calendarDAO.getDatabaseSize()
+        }
+    }
+
+    companion object {
+        private const val MAX_SIZE = 10
     }
 
 }

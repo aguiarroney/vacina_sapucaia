@@ -12,6 +12,12 @@ interface CalendarDAO {
     @Query("SELECT * FROM calendar ORDER BY id DESC LIMIT 1")
     fun getLastInsertion(): DatabaseEntities
 
+    @Query(" SELECT COUNT(*) FROM calendar ")
+    fun getDatabaseSize(): Int
+
+    @Query("DELETE FROM calendar")
+    fun clearRoom()
+
 }
 
 @Database(entities = [DatabaseEntities::class], version = 1, exportSchema = false)

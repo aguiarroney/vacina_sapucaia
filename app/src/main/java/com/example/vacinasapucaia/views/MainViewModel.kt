@@ -61,6 +61,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun saveToDataStore(calendarModel: Calendar) {
         viewModelScope.launch {
             _roomRespository.insertCalendar(calendarModel.asDataBaseModel())
+            val res = _roomRespository.getDatabeseSize()
+            Log.i("room size", "${res}")
         }
     }
 
@@ -81,6 +83,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 getCalendar()
             }
         }
+    }
+
+    private fun manageRoom(){
+
     }
 
 }
