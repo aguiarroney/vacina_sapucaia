@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
@@ -13,7 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.vacinasapucaia.R
 import com.example.vacinasapucaia.databinding.FragmentMainBinding
-import com.example.vacinasapucaia.repository.Repository
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 
@@ -38,17 +36,24 @@ class Main : Fragment() {
             Snackbar.LENGTH_INDEFINITE
         )
 
-        _viewModel.getCalendar()
+        _viewModel.inflateMainCalendar()
+
+        _viewModel.refreshTime.observe(viewLifecycleOwner, {
+            _binding.tvDate.text =
+                getString(R.string.refresh_label, _viewModel.refreshTime.value)
+        })
 
         _viewModel.mainCalendar.observe(viewLifecycleOwner, Observer {
-            _binding.cvMainCalendar.isVisible = true
-            _binding.pgProgressBar.isVisible = false
-            Picasso.with(context)
-                .load(it)
-                .into(_binding.ivMainCalendar)
-            _binding.tvDate.text = getString(R.string.refresh_label, _viewModel.getCurrentTime())
-            _viewModel.readFromDataStore(it)
-            _viewModel.saveToDataStore(it)
+            if (!it.isNullOrEmpty()) {
+                _binding.cvMainCalendar.isVisible = true
+                _binding.pgProgressBar.isVisible = false
+                Picasso.with(context)
+                    .load(it)
+                    .into(_binding.ivMainCalendar)
+
+            } else {
+                _viewModel.getCalendar()
+            }
         })
 
         _viewModel.snackBarControll.observe(viewLifecycleOwner, {
@@ -74,7 +79,6 @@ class Main : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.mi_refresh -> {
-                Log.i("refresh", "refresh")
                 _binding.pgProgressBar.isVisible = true
                 _viewModel.getCalendar()
             }

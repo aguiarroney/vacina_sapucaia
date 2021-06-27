@@ -1,16 +1,16 @@
 package com.example.vacinasapucaia.views
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import com.example.vacinasapucaia.repository.DataStoreRespository
+import androidx.lifecycle.*
+import com.example.vacinasapucaia.local.getDatabase
+import com.example.vacinasapucaia.models.Calendar
 import com.example.vacinasapucaia.repository.Repository
-import kotlinx.coroutines.flow.collect
+import com.example.vacinasapucaia.repository.RoomRepository
+import com.example.vacinasapucaia.utils.asDataBaseModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -18,13 +18,17 @@ import java.util.*
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _repository = Repository(application)
-    private val _dataStoreRepository = DataStoreRespository(application)
 
-    private val _mainCalendar = MutableLiveData<String>()
+    private val _roomRespository = RoomRepository(getDatabase(application))
+
+    private var _mainCalendar = MutableLiveData<String>()
     val mainCalendar: LiveData<String> = _mainCalendar
 
     private val _snackBarControll = MutableLiveData<Boolean>()
     val snackBarControll: LiveData<Boolean> = _snackBarControll
+
+    private val _refreshTime = MutableLiveData<String>()
+    val refreshTime: LiveData<String> = _refreshTime
 
     @RequiresApi(Build.VERSION_CODES.M)
     fun getCalendar() {
@@ -33,35 +37,50 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (response.isEmpty())
                 _snackBarControll.value = true
             else {
+                val currentTime = getCurrentTime()
                 _mainCalendar.value = response
-
+                _refreshTime.value = currentTime
+                saveToDataStore(
+                    Calendar(
+                        0,
+                        response,
+                        currentTime
+                    )
+                )
             }
         }
     }
 
-    fun getCurrentTime(): String {
+    @SuppressLint("SimpleDateFormat")
+    private fun getCurrentTime(): String {
         val sdf = SimpleDateFormat("hh:mm dd/M/yyyy")
         return sdf.format(Date())
     }
 
-    fun readFromDataStore(url: String) {
-        viewModelScope.launch {
 
-            _dataStoreRepository.readFromDataStore.collect {
-                Log.i("readDataStore", it)
-                //todo trigger notifications
-            }
-        }
-    }
-
-    fun saveToDataStore(url: String) {
+    private fun saveToDataStore(calendarModel: Calendar) {
         viewModelScope.launch {
-            _dataStoreRepository.saveToDataStore(url)
+            _roomRespository.insertCalendar(calendarModel.asDataBaseModel())
         }
     }
 
     fun restoreSnackBarState() {
         _snackBarControll.value = false
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun inflateMainCalendar() {
+        viewModelScope.launch {
+            val res = _roomRespository.getLastCalendarInsertion()
+            if (!res.calendarUrl.isEmpty()) {
+                _mainCalendar.value = res.calendarUrl
+                _refreshTime.value = res.refreshDate
+                Log.i("room", "refresh time ${res.refreshDate}")
+                Log.i("room", "refresh time ${_refreshTime.value}")
+            } else {
+                getCalendar()
+            }
+        }
     }
 
 }
