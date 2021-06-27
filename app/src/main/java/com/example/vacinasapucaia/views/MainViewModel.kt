@@ -11,6 +11,7 @@ import com.example.vacinasapucaia.models.Calendar
 import com.example.vacinasapucaia.repository.Repository
 import com.example.vacinasapucaia.repository.RoomRepository
 import com.example.vacinasapucaia.utils.asDataBaseModel
+import com.example.vacinasapucaia.utils.getCurrentTime
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -51,13 +52,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
-    private fun getCurrentTime(): String {
-        val sdf = SimpleDateFormat("hh:mm dd/M/yyyy")
-        return sdf.format(Date())
-    }
-
-
     private fun saveToDataStore(calendarModel: Calendar) {
         viewModelScope.launch {
             _roomRespository.insertCalendar(calendarModel.asDataBaseModel())
@@ -77,16 +71,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (!res.calendarUrl.isEmpty()) {
                 _mainCalendar.value = res.calendarUrl
                 _refreshTime.value = res.refreshDate
-                Log.i("room", "refresh time ${res.refreshDate}")
-                Log.i("room", "refresh time ${_refreshTime.value}")
             } else {
                 getCalendar()
             }
         }
-    }
-
-    private fun manageRoom(){
-
     }
 
 }
