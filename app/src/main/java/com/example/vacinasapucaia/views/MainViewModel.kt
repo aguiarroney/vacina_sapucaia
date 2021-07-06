@@ -79,9 +79,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun inflateMainCalendar() {
         viewModelScope.launch {
             val res = _roomRespository.getLastCalendarInsertion()
-            if (!res.calendarUrl.isEmpty()) {
-                _mainCalendar.value = res.calendarUrl
-                _refreshTime.value = res.refreshDate
+            if (res != null) {
+                if(!res.calendarUrl.isEmpty()){
+                    _mainCalendar.value = res.calendarUrl
+                    _refreshTime.value = res.refreshDate
+                }
             } else {
                 getCalendar()
             }
