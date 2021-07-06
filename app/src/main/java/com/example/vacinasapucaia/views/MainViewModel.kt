@@ -54,6 +54,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun getBoletim() = viewModelScope.launch {
+        val response = _repository.getBoletim()
+        Log.i("boletim", "${response}")
+    }
+
     private fun checkIfIsNewCalendar(url: String) {
         viewModelScope.launch {
             val lastCalendar = _roomRespository.getLastCalendarInsertion().calendarUrl
@@ -80,7 +86,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val res = _roomRespository.getLastCalendarInsertion()
             if (res != null) {
-                if(!res.calendarUrl.isEmpty()){
+                if (!res.calendarUrl.isEmpty()) {
                     _mainCalendar.value = res.calendarUrl
                     _refreshTime.value = res.refreshDate
                 }
