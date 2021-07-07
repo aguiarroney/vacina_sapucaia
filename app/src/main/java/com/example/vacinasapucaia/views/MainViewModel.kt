@@ -6,7 +6,10 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.vacinasapucaia.R
 import com.example.vacinasapucaia.local.getDatabase
 import com.example.vacinasapucaia.models.Calendar
@@ -62,7 +65,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val response = _repository.getBoletim()
         Log.i("boletim", "${response}")
 
-        if(response.isNotEmpty()){
+        if (response.isNotEmpty()) {
             _mainBoletim.value = response
         }
     }
@@ -89,19 +92,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun inflateMainCalendar() {
-        viewModelScope.launch {
-            val res = _roomRespository.getLastCalendarInsertion()
-            if (res != null) {
-                if (!res.calendarUrl.isEmpty()) {
-                    _mainCalendar.value = res.calendarUrl
-                    _refreshTime.value = res.refreshDate
-                }
-            } else {
-                getCalendar()
+    fun inflateMainCalendar() = viewModelScope.launch {
+
+        getBoletim()
+
+        val res = _roomRespository.getLastCalendarInsertion()
+        if (res != null) {
+            if (!res.calendarUrl.isEmpty()) {
+                _mainCalendar.value = res.calendarUrl
+                _refreshTime.value = res.refreshDate
             }
+        } else {
+            getCalendar()
         }
     }
+
 
     private fun callNotification() {
         val notificationManager = ContextCompat.getSystemService(

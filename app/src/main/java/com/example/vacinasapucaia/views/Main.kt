@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
@@ -15,7 +14,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.vacinasapucaia.R
 import com.example.vacinasapucaia.databinding.FragmentMainBinding
-import com.example.vacinasapucaia.work.UpdateCalendarWorker
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 
@@ -41,7 +39,6 @@ class Main : Fragment() {
         )
 
         _viewModel.inflateMainCalendar()
-        _viewModel.getBoletim()
 
         _viewModel.refreshTime.observe(viewLifecycleOwner, {
             _binding.tvDate.text =
@@ -54,7 +51,7 @@ class Main : Fragment() {
                 _binding.ivMainCalendar.isVisible = true
                 _binding.pgProgressBar.isVisible = false
                 _binding.tvDate.isVisible = true
-                
+
                 Picasso.with(context)
                     .load(it)
                     .into(_binding.ivMainCalendar)
