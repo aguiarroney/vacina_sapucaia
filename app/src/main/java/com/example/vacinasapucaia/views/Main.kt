@@ -51,7 +51,10 @@ class Main : Fragment() {
         _viewModel.mainCalendar.observe(viewLifecycleOwner, Observer {
             if (!it.isNullOrEmpty()) {
                 _binding.cvMainCalendar.isVisible = true
+                _binding.ivMainCalendar.isVisible = true
                 _binding.pgProgressBar.isVisible = false
+                _binding.tvDate.isVisible = true
+                
                 Picasso.with(context)
                     .load(it)
                     .into(_binding.ivMainCalendar)
@@ -93,6 +96,8 @@ class Main : Fragment() {
         when (item.itemId) {
             R.id.mi_refresh -> {
                 _binding.pgProgressBar.isVisible = true
+                _binding.ivMainCalendar.isVisible = false
+                _binding.tvDate.isVisible = false
                 _viewModel.getCalendar()
             }
         }
