@@ -41,6 +41,7 @@ class Main : Fragment() {
         )
 
         _viewModel.inflateMainCalendar()
+        _viewModel.getBoletim()
 
         _viewModel.refreshTime.observe(viewLifecycleOwner, {
             _binding.tvDate.text =
@@ -57,6 +58,14 @@ class Main : Fragment() {
 
             } else {
                 _viewModel.getCalendar()
+            }
+        })
+
+        _viewModel.mainBoletim.observe(viewLifecycleOwner, {
+            if (!it.isNullOrEmpty()) {
+                Picasso.with(context)
+                    .load(it)
+                    .into(_binding.ivMainBoletim)
             }
         })
 

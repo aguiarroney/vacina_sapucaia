@@ -26,6 +26,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var _mainCalendar = MutableLiveData<String>()
     val mainCalendar: LiveData<String> = _mainCalendar
 
+    private var _mainBoletim = MutableLiveData<String>()
+    val mainBoletim: LiveData<String> = _mainBoletim
+
     private val _snackBarControll = MutableLiveData<Boolean>()
     val snackBarControll: LiveData<Boolean> = _snackBarControll
 
@@ -58,6 +61,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getBoletim() = viewModelScope.launch {
         val response = _repository.getBoletim()
         Log.i("boletim", "${response}")
+
+        if(response.isNotEmpty()){
+            _mainBoletim.value = response
+        }
     }
 
     private fun checkIfIsNewCalendar(url: String) {
