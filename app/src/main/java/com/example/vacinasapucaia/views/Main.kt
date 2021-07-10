@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
@@ -40,24 +41,52 @@ class Main : Fragment() {
 
         _viewModel.inflateMainScreen()
 
-        _viewModel.mainCalendarModel.observe(viewLifecycleOwner, Observer {
+        _viewModel.mainLayoutItems.observe(viewLifecycleOwner, Observer {
+            Log.i("main itens", "${it}")
             if (it != null) {
-                val layoutItem: ScreenItemBinding =
-                    DataBindingUtil.inflate(inflater, R.layout.screen_item, container, false)
-
-                layoutItem.itemScreen = it
-
-                Picasso.with(context)
-                    .load(it.calendarUrl)
-                    .into(layoutItem.ivMainImg)
-
                 _binding.llViews.removeAllViews()
-                _binding.llViews.addView(layoutItem.root)
+                it.forEach {
+                    if (it != null) {
+                        val layoutItem: ScreenItemBinding =
+                            DataBindingUtil.inflate(
+                                inflater,
+                                R.layout.screen_item,
+                                container,
+                                false
+                            )
 
-            } else {
-                _viewModel.getCalendar()
+                        layoutItem.itemScreen = it
+
+                        if (it.calendarUrl.isNotEmpty()) {
+                            Picasso.with(context)
+                                .load(it.calendarUrl)
+                                .into(layoutItem.ivMainImg)
+                        }
+
+                        _binding.llViews.addView(layoutItem.root)
+                    }
+                }
             }
         })
+
+//        _viewModel.mainCalendarModel.observe(viewLifecycleOwner, Observer {
+//            if (it != null) {
+//                val layoutItem: ScreenItemBinding =
+//                    DataBindingUtil.inflate(inflater, R.layout.screen_item, container, false)
+//
+//                layoutItem.itemScreen = it
+//
+//                Picasso.with(context)
+//                    .load(it.calendarUrl)
+//                    .into(layoutItem.ivMainImg)
+//
+//                _binding.llViews.removeAllViews()
+//                _binding.llViews.addView(layoutItem.root)
+//
+//            } else {
+//                _viewModel.getCalendar()
+//            }
+//        })
 
         //todo think of a way to show the snackbar
 //        _viewModel.snackBarControll.observe(viewLifecycleOwner, {

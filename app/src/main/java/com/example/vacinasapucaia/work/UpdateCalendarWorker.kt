@@ -1,13 +1,10 @@
 package com.example.vacinasapucaia.work
 
-import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import android.provider.SyncStateContract
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewModelScope
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.vacinasapucaia.R
@@ -19,7 +16,6 @@ import com.example.vacinasapucaia.repository.sendNotification
 import com.example.vacinasapucaia.utils.DATABASE_ITEM_DESCRIPTION_CALENDAR
 import com.example.vacinasapucaia.utils.asDataBaseModel
 import com.example.vacinasapucaia.utils.getCurrentTime
-import kotlinx.coroutines.launch
 import java.lang.Exception
 
 class UpdateCalendarWorker(appContext: Context, params: WorkerParameters) :
@@ -41,13 +37,14 @@ class UpdateCalendarWorker(appContext: Context, params: WorkerParameters) :
             val calendarUrl = repository.getCalendar()
             val calendar = Calendar(0, calendarUrl, getCurrentTime(), DATABASE_ITEM_DESCRIPTION_CALENDAR)
 
-            val lastCalendar = roomRepository.getLastCalendarInsertion().calendarUrl
+            val lastCalendar = roomRepository.getLastCalendarInsertion(
+                DATABASE_ITEM_DESCRIPTION_CALENDAR).calendarUrl
 
             if (lastCalendar != calendarUrl) {
                 callNotification()
             }
 
-            roomRepository.insertCalendar(calendar.asDataBaseModel())
+            roomRepository.insertObjectToDatabase(calendar.asDataBaseModel())
             Result.success()
 
         } catch (e: Exception) {

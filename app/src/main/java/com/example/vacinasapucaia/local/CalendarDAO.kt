@@ -8,7 +8,7 @@ import com.example.vacinasapucaia.utils.DATABASE_ITEM_DESCRIPTION_CALENDAR
 interface CalendarDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertCalendar(calendar: DatabaseEntities)
+    fun insertObject(calendar: DatabaseEntities)
 
     @Query("SELECT * FROM calendar WHERE description ==:desc ORDER BY id DESC LIMIT 1")
     fun getLastInsertion(desc: String): DatabaseEntities

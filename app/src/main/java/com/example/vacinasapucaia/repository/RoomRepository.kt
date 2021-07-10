@@ -8,18 +8,18 @@ import kotlinx.coroutines.withContext
 
 class RoomRepository(private val database: CalendarDatabase) {
 
-    suspend fun insertCalendar(calendarEntities: DatabaseEntities) {
+    suspend fun insertObjectToDatabase(calendarEntities: DatabaseEntities) {
         withContext(Dispatchers.IO) {
             if (database.calendarDAO.getDatabaseSize() >= MAX_SIZE)
                 database.calendarDAO.clearRoom()
 
-            database.calendarDAO.insertCalendar(calendarEntities)
+            database.calendarDAO.insertObject(calendarEntities)
         }
     }
 
-    suspend fun getLastCalendarInsertion(): DatabaseEntities {
+    suspend fun getLastCalendarInsertion(dataDescription: String): DatabaseEntities {
         return withContext(Dispatchers.IO) {
-            database.calendarDAO.getLastInsertion(DATABASE_ITEM_DESCRIPTION_CALENDAR)
+            database.calendarDAO.getLastInsertion(dataDescription)
         }
     }
 
