@@ -7,13 +7,13 @@ import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.annotation.RequiresApi
-import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.vacinasapucaia.R
 import com.example.vacinasapucaia.databinding.FragmentMainBinding
+import com.example.vacinasapucaia.databinding.ScreenItemBinding
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 
@@ -38,46 +38,37 @@ class Main : Fragment() {
             Snackbar.LENGTH_INDEFINITE
         )
 
-        _viewModel.inflateMainCalendar()
+        _viewModel.inflateMainScreen()
 
-        _viewModel.refreshTime.observe(viewLifecycleOwner, {
-            _binding.tvDate.text =
-                getString(R.string.refresh_label, _viewModel.refreshTime.value)
-        })
+        _viewModel.mainCalendarModel.observe(viewLifecycleOwner, Observer {
+            if (it != null) {
+                val layoutItem: ScreenItemBinding =
+                    DataBindingUtil.inflate(inflater, R.layout.screen_item, container, false)
 
-        _viewModel.mainCalendar.observe(viewLifecycleOwner, Observer {
-            if (!it.isNullOrEmpty()) {
-                _binding.cvMainCalendar.isVisible = true
-                _binding.ivMainCalendar.isVisible = true
-                _binding.pgProgressBar.isVisible = false
-                _binding.tvDate.isVisible = true
+                layoutItem.itemScreen = it
 
                 Picasso.with(context)
-                    .load(it)
-                    .into(_binding.ivMainCalendar)
+                    .load(it.calendarUrl)
+                    .into(layoutItem.ivMainImg)
+
+                _binding.llViews.removeAllViews()
+                _binding.llViews.addView(layoutItem.root)
 
             } else {
                 _viewModel.getCalendar()
             }
         })
 
-        _viewModel.mainBoletim.observe(viewLifecycleOwner, {
-            if (!it.isNullOrEmpty()) {
-                Picasso.with(context)
-                    .load(it)
-                    .into(_binding.ivMainBoletim)
-            }
-        })
-
-        _viewModel.snackBarControll.observe(viewLifecycleOwner, {
-            if (it) {
-                _binding.pgProgressBar.isVisible = false
-                _snackBar.setAction("Ok") {
-                    _viewModel.restoreSnackBarState()
-                }
-                _snackBar.show()
-            }
-        })
+        //todo think of a way to show the snackbar
+//        _viewModel.snackBarControll.observe(viewLifecycleOwner, {
+//            if (it) {
+//                _binding.pgProgressBar.isVisible = false
+//                _snackBar.setAction("Ok") {
+//                    _viewModel.restoreSnackBarState()
+//                }
+//                _snackBar.show()
+//            }
+//        })
 
         createChannel(getString(R.string.notification_channel_id), getString(R.string.app_name))
         setHasOptionsMenu(true)
@@ -92,9 +83,6 @@ class Main : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.mi_refresh -> {
-                _binding.pgProgressBar.isVisible = true
-                _binding.ivMainCalendar.isVisible = false
-                _binding.tvDate.isVisible = false
                 _viewModel.getCalendar()
             }
         }

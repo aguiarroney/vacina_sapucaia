@@ -26,14 +26,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _roomRespository = RoomRepository(getDatabase(application))
 
-    private var _mainCalendar = MutableLiveData<String>()
-    val mainCalendar: LiveData<String> = _mainCalendar
+    private var _mainCalendarModel = MutableLiveData<Calendar>()
+    val mainCalendarModel: LiveData<Calendar> = _mainCalendarModel
 
     private var _mainBoletim = MutableLiveData<String>()
     val mainBoletim: LiveData<String> = _mainBoletim
 
-    private val _snackBarControll = MutableLiveData<Boolean>()
-    val snackBarControll: LiveData<Boolean> = _snackBarControll
+    //todo think of a way to show snackbar
+//    private val _snackBarControll = MutableLiveData<Boolean>()
+//    val snackBarControll: LiveData<Boolean> = _snackBarControll
 
     private val _refreshTime = MutableLiveData<String>()
     val refreshTime: LiveData<String> = _refreshTime
@@ -43,18 +44,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val response = _repository.getCalendar()
             if (response.isEmpty())
-                _snackBarControll.value = true
+                Log.i("getCalendar", "show snackbar")
+//                _snackBarControll.value = true
             else {
                 checkIfIsNewCalendar(response)
-                val currentTime = getCurrentTime()
-                _mainCalendar.value = response
-                _refreshTime.value = currentTime
+                val currentTime: String = getCurrentTime()
+                val calendar = Calendar(
+                    0,
+                    response,
+                    currentTime
+                )
+                _mainCalendarModel.value = calendar
                 saveToDataStore(
-                    Calendar(
-                        0,
-                        response,
-                        currentTime
-                    )
+                    calendar
                 )
             }
         }
@@ -86,21 +88,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             Log.i("room size", "${res}")
         }
     }
-
-    fun restoreSnackBarState() {
-        _snackBarControll.value = false
-    }
+    //todo think of a way to show snackbar
+//    fun restoreSnackBarState() {
+//        _snackBarControll.value = false
+//    }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun inflateMainCalendar() = viewModelScope.launch {
+    fun inflateMainScreen() = viewModelScope.launch {
 
-        getBoletim()
+//        getBoletim()
 
         val res = _roomRespository.getLastCalendarInsertion()
         if (res != null) {
             if (!res.calendarUrl.isEmpty()) {
-                _mainCalendar.value = res.calendarUrl
-                _refreshTime.value = res.refreshDate
+                val calendar = Calendar(res.id, res.calendarUrl, res.refreshDate)
+                _mainCalendarModel.value = calendar
             }
         } else {
             getCalendar()
