@@ -16,6 +16,7 @@ import com.example.vacinasapucaia.models.Calendar
 import com.example.vacinasapucaia.repository.Repository
 import com.example.vacinasapucaia.repository.RoomRepository
 import com.example.vacinasapucaia.repository.sendNotification
+import com.example.vacinasapucaia.utils.DATABASE_ITEM_DESCRIPTION_CALENDAR
 import com.example.vacinasapucaia.utils.asDataBaseModel
 import com.example.vacinasapucaia.utils.getCurrentTime
 import kotlinx.coroutines.launch
@@ -52,7 +53,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val calendar = Calendar(
                     0,
                     response,
-                    currentTime
+                    currentTime,
+                    DATABASE_ITEM_DESCRIPTION_CALENDAR
                 )
                 _mainCalendarModel.value = calendar
                 saveToDataStore(
@@ -101,7 +103,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val res = _roomRespository.getLastCalendarInsertion()
         if (res != null) {
             if (!res.calendarUrl.isEmpty()) {
-                val calendar = Calendar(res.id, res.calendarUrl, res.refreshDate)
+                val calendar = Calendar(res.id, res.calendarUrl, res.refreshDate, res.description)
                 _mainCalendarModel.value = calendar
             }
         } else {

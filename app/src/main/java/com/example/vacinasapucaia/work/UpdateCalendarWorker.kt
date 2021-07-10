@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.provider.SyncStateContract
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,7 @@ import com.example.vacinasapucaia.models.Calendar
 import com.example.vacinasapucaia.repository.Repository
 import com.example.vacinasapucaia.repository.RoomRepository
 import com.example.vacinasapucaia.repository.sendNotification
+import com.example.vacinasapucaia.utils.DATABASE_ITEM_DESCRIPTION_CALENDAR
 import com.example.vacinasapucaia.utils.asDataBaseModel
 import com.example.vacinasapucaia.utils.getCurrentTime
 import kotlinx.coroutines.launch
@@ -37,7 +39,7 @@ class UpdateCalendarWorker(appContext: Context, params: WorkerParameters) :
 
         return try {
             val calendarUrl = repository.getCalendar()
-            val calendar = Calendar(0, calendarUrl, getCurrentTime())
+            val calendar = Calendar(0, calendarUrl, getCurrentTime(), DATABASE_ITEM_DESCRIPTION_CALENDAR)
 
             val lastCalendar = roomRepository.getLastCalendarInsertion().calendarUrl
 

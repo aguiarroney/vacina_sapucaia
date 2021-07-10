@@ -2,6 +2,7 @@ package com.example.vacinasapucaia.local
 
 import android.content.Context
 import androidx.room.*
+import com.example.vacinasapucaia.utils.DATABASE_ITEM_DESCRIPTION_CALENDAR
 
 @Dao
 interface CalendarDAO {
@@ -9,8 +10,8 @@ interface CalendarDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCalendar(calendar: DatabaseEntities)
 
-    @Query("SELECT * FROM calendar ORDER BY id DESC LIMIT 1")
-    fun getLastInsertion(): DatabaseEntities
+    @Query("SELECT * FROM calendar WHERE description ==:desc ORDER BY id DESC LIMIT 1")
+    fun getLastInsertion(desc: String): DatabaseEntities
 
     @Query(" SELECT COUNT(*) FROM calendar ")
     fun getDatabaseSize(): Int
@@ -34,7 +35,7 @@ fun getDatabase(context: Context): CalendarDatabase {
             INSTANCE = Room.databaseBuilder(
                 context.applicationContext,
                 CalendarDatabase::class.java,
-                "calendar"
+                DATABASE_ITEM_DESCRIPTION_CALENDAR
             ).build()
         }
     }

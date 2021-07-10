@@ -8,6 +8,7 @@ fun Calendar.asDataBaseModel(): DatabaseEntities {
     return DatabaseEntities(
         id = this.id,
         calendarUrl = this.calendarUrl,
-        refreshDate = this.refreshDate
+        refreshDate = this.refreshDate,
+        description = this.description
     )
 }
