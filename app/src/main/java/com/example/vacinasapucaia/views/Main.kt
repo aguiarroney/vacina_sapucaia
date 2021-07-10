@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
@@ -15,7 +14,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.vacinasapucaia.R
 import com.example.vacinasapucaia.databinding.FragmentMainBinding
-import com.example.vacinasapucaia.work.UpdateCalendarWorker
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 
@@ -50,13 +48,24 @@ class Main : Fragment() {
         _viewModel.mainCalendar.observe(viewLifecycleOwner, Observer {
             if (!it.isNullOrEmpty()) {
                 _binding.cvMainCalendar.isVisible = true
+                _binding.ivMainCalendar.isVisible = true
                 _binding.pgProgressBar.isVisible = false
+                _binding.tvDate.isVisible = true
+
                 Picasso.with(context)
                     .load(it)
                     .into(_binding.ivMainCalendar)
 
             } else {
                 _viewModel.getCalendar()
+            }
+        })
+
+        _viewModel.mainBoletim.observe(viewLifecycleOwner, {
+            if (!it.isNullOrEmpty()) {
+                Picasso.with(context)
+                    .load(it)
+                    .into(_binding.ivMainBoletim)
             }
         })
 
@@ -84,6 +93,8 @@ class Main : Fragment() {
         when (item.itemId) {
             R.id.mi_refresh -> {
                 _binding.pgProgressBar.isVisible = true
+                _binding.ivMainCalendar.isVisible = false
+                _binding.tvDate.isVisible = false
                 _viewModel.getCalendar()
             }
         }

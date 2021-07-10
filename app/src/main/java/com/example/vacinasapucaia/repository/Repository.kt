@@ -17,8 +17,7 @@ class Repository(private val context: Context) {
 
     companion object {
 
-        const val BASE_URL = "http://transparencia.covid.sapucaia.rj.gov.br"
-        const val BASE_URL2 = "https://www.sapucaia.rj.gov.br/boletim/covid-19/"
+        const val BASE_URL = "https://www.sapucaia.rj.gov.br/"
 
         private val okHTTPClient: OkHttpClient.Builder = OkHttpClient.Builder()
         private val loggingInterceptor = HttpLoggingInterceptor()
@@ -32,14 +31,7 @@ class Repository(private val context: Context) {
             .baseUrl(BASE_URL)
             .build()
 
-        private val retrofit2 =
-            Retrofit.Builder().addConverterFactory(ScalarsConverterFactory.create()).client(
-                okHTTPClient.addInterceptor(loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build()
-            ).baseUrl(BASE_URL2).build()
-
         val apiService = retrofit.create(ApiService::class.java)
-        val apiService2 = retrofit2.create(ApiService::class.java)
     }
 
 
@@ -58,20 +50,23 @@ class Repository(private val context: Context) {
 
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun getCalendar(): String {
-        return proccessResponseBody(apiService, 1)
+        return proccessResponseBody(1)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun getBoletim(): String {
-        return proccessResponseBody(apiService2, 0)
+        return proccessResponseBody(0)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private suspend fun proccessResponseBody(apiService: ApiService, action: Int): String {
+    private suspend fun proccessResponseBody(action: Int): String {
         var returnString = ""
 
         if (isNetworkAvailable(context)) {
-            val response = apiService.getPage()
+            val response = when (action) {
+                0 -> apiService.getPage2()
+                else -> apiService.getPage()
+            }
 
             if (response.isSuccessful) {
                 Log.i("response", "${response.body()}")
@@ -101,6 +96,6 @@ class Repository(private val context: Context) {
 
     private fun proccesPageAndGetCalendar(pageBody: String): String {
         val page = Jsoup.parse(pageBody)
-        return page.getElementById("carouselExampleIndicators").getElementsByTag("img").attr("src")
+        return page.getElementsByClass("article-featured")[0].getElementsByTag("img").attr("src")
     }
 }
