@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class DatabaseEntities(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val calendarUrl: String,
-    val refreshDate: String
+    val refreshDate: String,
+    val description: String
 )

@@ -16,6 +16,8 @@ import com.example.vacinasapucaia.models.Calendar
 import com.example.vacinasapucaia.repository.Repository
 import com.example.vacinasapucaia.repository.RoomRepository
 import com.example.vacinasapucaia.repository.sendNotification
+import com.example.vacinasapucaia.utils.DATABASE_ITEM_DESCRIPTION_BOLETIM
+import com.example.vacinasapucaia.utils.DATABASE_ITEM_DESCRIPTION_CALENDAR
 import com.example.vacinasapucaia.utils.asDataBaseModel
 import com.example.vacinasapucaia.utils.getCurrentTime
 import kotlinx.coroutines.launch
@@ -26,14 +28,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _roomRespository = RoomRepository(getDatabase(application))
 
-    private var _mainCalendar = MutableLiveData<String>()
-    val mainCalendar: LiveData<String> = _mainCalendar
+    private var _controlList = arrayOf<Calendar>(Calendar(0, "", "", ""), Calendar(0, "", "", ""))
 
-    private var _mainBoletim = MutableLiveData<String>()
-    val mainBoletim: LiveData<String> = _mainBoletim
+    private var _mainLayoutItems = MutableLiveData<Array<Calendar>>()
+    val mainLayoutItems: LiveData<Array<Calendar>> = _mainLayoutItems
 
-    private val _snackBarControll = MutableLiveData<Boolean>()
-    val snackBarControll: LiveData<Boolean> = _snackBarControll
+
+    //todo think of a way to show snackbar
+//    private val _snackBarControll = MutableLiveData<Boolean>()
+//    val snackBarControll: LiveData<Boolean> = _snackBarControll
 
     private val _refreshTime = MutableLiveData<String>()
     val refreshTime: LiveData<String> = _refreshTime
@@ -43,18 +46,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val response = _repository.getCalendar()
             if (response.isEmpty())
-                _snackBarControll.value = true
+                Log.i("getCalendar", "show snackbar")
+//                _snackBarControll.value = true
             else {
-                checkIfIsNewCalendar(response)
-                val currentTime = getCurrentTime()
-                _mainCalendar.value = response
-                _refreshTime.value = currentTime
+                checkIfIsNewCalendar(response, DATABASE_ITEM_DESCRIPTION_CALENDAR)
+                val currentTime: String = getCurrentTime()
+                val calendar = Calendar(
+                    0,
+                    response,
+                    currentTime,
+                    DATABASE_ITEM_DESCRIPTION_CALENDAR
+                )
+                _controlList[0] = calendar
+                _mainLayoutItems.value = _controlList
+
                 saveToDataStore(
-                    Calendar(
-                        0,
-                        response,
-                        currentTime
-                    )
+                    calendar
                 )
             }
         }
@@ -66,45 +73,106 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         Log.i("boletim", "${response}")
 
         if (response.isNotEmpty()) {
-            _mainBoletim.value = response
+
+            checkIfIsNewCalendar(response, DATABASE_ITEM_DESCRIPTION_BOLETIM)
+            val currentTime: String = getCurrentTime()
+            val boletim = Calendar(
+                0,
+                response,
+                currentTime,
+                DATABASE_ITEM_DESCRIPTION_BOLETIM
+            )
+
+            _controlList[1] = boletim
+            _mainLayoutItems.value = _controlList
+
+            Log.i("boletim", "salva boletim")
+            saveToDataStore(
+                boletim
+            )
+        } else {
+            Log.i("boletim", "não pegou o boletim")
         }
     }
 
-    private fun checkIfIsNewCalendar(url: String) {
+    private fun checkIfIsNewCalendar(url: String, dataDescription: String) {
         viewModelScope.launch {
-            val lastCalendar = _roomRespository.getLastCalendarInsertion().calendarUrl
-            if (lastCalendar != url) {
-                callNotification()
+            val lastCalendarObject = _roomRespository.getLastCalendarInsertion(
+                dataDescription
+            )
+
+            lastCalendarObject?.let {
+                val lastCalendar = lastCalendarObject.calendarUrl
+                if (lastCalendar != url) {
+                    callNotification()
+                }
             }
+
         }
     }
 
     private fun saveToDataStore(calendarModel: Calendar) {
         viewModelScope.launch {
-            _roomRespository.insertCalendar(calendarModel.asDataBaseModel())
+            _roomRespository.insertObjectToDatabase(calendarModel.asDataBaseModel())
             val res = _roomRespository.getDatabeseSize()
             Log.i("room size", "${res}")
         }
     }
-
-    fun restoreSnackBarState() {
-        _snackBarControll.value = false
-    }
+    //todo think of a way to show snackbar
+//    fun restoreSnackBarState() {
+//        _snackBarControll.value = false
+//    }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun inflateMainCalendar() = viewModelScope.launch {
+    fun inflateMainScreen() = viewModelScope.launch {
 
-        getBoletim()
+        var calendar: Calendar? = null
+        var boletim: Calendar? = null
 
-        val res = _roomRespository.getLastCalendarInsertion()
-        if (res != null) {
-            if (!res.calendarUrl.isEmpty()) {
-                _mainCalendar.value = res.calendarUrl
-                _refreshTime.value = res.refreshDate
+        val resCalendar =
+            _roomRespository.getLastCalendarInsertion(DATABASE_ITEM_DESCRIPTION_CALENDAR)
+
+        val resBoletim =
+            _roomRespository.getLastCalendarInsertion(DATABASE_ITEM_DESCRIPTION_BOLETIM)
+
+        Log.i("boletim", "from db $resBoletim")
+        Log.i("calendar", "from db $resCalendar")
+
+        if (resCalendar != null) {
+            if (!resCalendar.calendarUrl.isEmpty()) {
+                calendar = Calendar(
+                    resCalendar.id,
+                    resCalendar.calendarUrl,
+                    resCalendar.refreshDate,
+                    resCalendar.description
+                )
+            }
+        }
+
+        if (resBoletim != null) {
+            if (!resBoletim.calendarUrl.isEmpty()) {
+                boletim = Calendar(
+                    resBoletim.id,
+                    resBoletim.calendarUrl,
+                    resBoletim.refreshDate,
+                    resBoletim.description
+                )
+            }
+        }
+
+        if (calendar != null && boletim != null) {
+            if (!calendar.calendarUrl.isNullOrEmpty() && !boletim.calendarUrl.isNullOrEmpty()) {
+                _controlList[0] = calendar
+                _controlList[1] = boletim
+                Log.i("array", "${_controlList[0]}, ${_controlList[1]}")
+                _mainLayoutItems.value = _controlList
+
             }
         } else {
             getCalendar()
+            getBoletim()
         }
+
     }
 
 
