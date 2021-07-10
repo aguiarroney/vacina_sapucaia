@@ -126,8 +126,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     @RequiresApi(Build.VERSION_CODES.M)
     fun inflateMainScreen() = viewModelScope.launch {
 
-        lateinit var calendar: Calendar
-        lateinit var boletim: Calendar
+        var calendar: Calendar? = null
+        var boletim: Calendar? = null
 
         val resCalendar =
             _roomRespository.getLastCalendarInsertion(DATABASE_ITEM_DESCRIPTION_CALENDAR)
@@ -160,12 +160,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        if (!calendar.calendarUrl.isNullOrEmpty() && !boletim.calendarUrl.isNullOrEmpty()) {
-            _controlList[0] = calendar
-            _controlList[1] = boletim
-            Log.i("array", "${_controlList[0]}, ${_controlList[1]}")
-            _mainLayoutItems.value = _controlList
+        if (calendar != null && boletim != null) {
+            if (!calendar.calendarUrl.isNullOrEmpty() && !boletim.calendarUrl.isNullOrEmpty()) {
+                _controlList[0] = calendar
+                _controlList[1] = boletim
+                Log.i("array", "${_controlList[0]}, ${_controlList[1]}")
+                _mainLayoutItems.value = _controlList
 
+            }
         } else {
             getCalendar()
             getBoletim()
